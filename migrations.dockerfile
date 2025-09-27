@@ -8,6 +8,5 @@ COPY pyproject.toml /app/
 
 RUN poetry install --no-root
 
-COPY .. /app
-
+COPY ./ /app
 CMD poetry run alembic upgrade head && poetry run python init.py

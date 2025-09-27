@@ -22,18 +22,31 @@ services:
       retries: 10
     networks: [backend]
 
+  api-migrations:
+    depends_on:
+      pgsql:
+        condition: service_healthy
+    build:
+      context: ./
+      dockerfile: ./migrations.dockerfile
+    env_file:
+      - ./.env
+    networks: [backend]
+
   api:
     build:
       context: ./
       dockerfile: ./Dockerfile
     container_name: api
     depends_on:
+      api-migrations:
+        condition: service_completed_successfully
       pgsql:
         condition: service_healthy
     env_file:
       - ./.env
     ports:
-      - "8000:8000"
+      - "8080:8080"
     networks: [backend]
 
 volumes:
