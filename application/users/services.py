@@ -34,7 +34,7 @@ class UsersService:
         self._builder.providers(UsersPermissionProvider(actor=actor, entity=users)).add(
             PermissionsEnum.CAN_READ_ALL_USERS
         ).apply()
-        return await self._repository.read_all(dto)
+        return users
 
     async def read_by_email(self, email: str) -> User:
         return await self._repository.read_by_email(email)
