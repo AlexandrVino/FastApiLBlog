@@ -5,9 +5,10 @@ from application.posts.exceptions import (
     PostAlreadyExistsError,
     PostNotFoundError,
 )
-from application.posts.repositories import CategoriesRepository
+from application.posts.repositories import CategoriesRepository, PostsRepository
 from domain.posts import entities
 
+from ..repositories.config import MapperConfig
 from ..repositories.repositories import CRUDDatabaseRepository
 from . import mappers
 from .models import CategoryDatabaseModel, PostDatabaseModel
@@ -21,12 +22,16 @@ class PostsDatabaseRepository(
         PostDatabaseModel,
         PostNotFoundError,
         PostAlreadyExistsError,
-        mappers.post__create_mapper,
-        mappers.post__map_from_db,
-        mappers.post__map_to_db,
-    ]
+    ],
+    PostsRepository,
 ):
     """Репозиторий для работы с постами в базе данных."""
+
+    _mapper = MapperConfig(
+        create_mapper=mappers.post__create_mapper,
+        entity_mapper=mappers.post__map_from_db,
+        model_mapper=mappers.post__map_to_db,
+    )
 
 
 class CategoriesDatabaseRepository(
@@ -37,10 +42,13 @@ class CategoriesDatabaseRepository(
         CategoryDatabaseModel,
         CategoryNotFoundError,
         CategoryAlreadyExistsError,
-        mappers.category__create_mapper,
-        mappers.category__map_from_db,
-        mappers.category__map_to_db,
     ],
     CategoriesRepository,
 ):
     """Репозиторий для работы с категориями в базе данных."""
+
+    _mapper = MapperConfig(
+        create_mapper=mappers.category__create_mapper,
+        entity_mapper=mappers.category__map_from_db,
+        model_mapper=mappers.category__map_to_db,
+    )

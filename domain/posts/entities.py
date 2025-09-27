@@ -7,11 +7,8 @@ class Category:
     id: int
     title: str
     description: str
-
-    # is not empty only on read operation
-    posts: list["Post"] = field(default_factory=list)
-    created_at: datetime | None = None
-    updated_at: datetime | None = None
+    created_at: datetime
+    updated_at: datetime
 
 
 @dataclass
@@ -19,7 +16,6 @@ class Post:
     id: int
     body: str
     title: str
-
+    created_at: datetime
+    updated_at: datetime
     category: Category
-    created_at: datetime | None = None
-    updated_at: datetime | None = None

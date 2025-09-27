@@ -7,7 +7,7 @@ from application.users.repositories import UsersRepository
 from domain.users import entities
 from infrastructure.config import Config
 
-from ..repositories.config import CRUDRepositoryConfig
+from ..repositories.config import CRUDRepositoryConfig, MapperConfig
 from ..repositories.repositories import CRUDDatabaseRepository
 from . import mappers
 from .models import UserDatabaseModel
@@ -21,11 +21,17 @@ class RepositoryConfig(
         UserDatabaseModel,
         UserNotFoundError,
         UserAlreadyExistsError,
-        mappers.user__create_mapper,
-        mappers.user__map_from_db,
-        mappers.user__map_to_db,
     ]
 ):
+    def __init__(self):
+        super().__init__(
+            MapperConfig(
+                create_mapper=mappers.user__create_mapper,
+                entity_mapper=mappers.user__map_from_db,
+                model_mapper=mappers.user__map_to_db,
+            )
+        )
+
     def get_select_by_email_query(self, email: str) -> Select:
         """Формирует запрос для поиска пользователя по email."""
 
@@ -40,9 +46,6 @@ class UsersDatabaseRepository(
         UserDatabaseModel,
         UserNotFoundError,
         UserAlreadyExistsError,
-        mappers.user__create_mapper,
-        mappers.user__map_from_db,
-        mappers.user__map_to_db,
     ],
     UsersRepository,
 ):

@@ -53,7 +53,7 @@ def create_app(container: AsyncContainer, config: Config) -> FastAPI:
         os.makedirs("static")
 
     app.mount("/static", StaticFiles(directory="static"), name="static")
-    app.include_router(v1_router, prefix="/api/v1")
+    app.include_router(v1_router, prefix="/api")
     setup_dishka(container, app)
 
     return app

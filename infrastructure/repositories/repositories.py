@@ -1,19 +1,17 @@
 import traceback
 from typing import Any, Generic, TypeVar
 
-from sqlalchemy import Insert, Select, Update, select
+from sqlalchemy import Insert, Select, Update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .config import (
     AlreadyExistsException,
     CreateDto,
-    CreateMapper,
     CRUDRepositoryConfig,
     Entity,
-    EntityMapper,
     Id,
-    ModelMapper,
+    MapperConfig,
     ModelType,
     NotFoundException,
     PostgresRepositoryConfig,
@@ -28,7 +26,7 @@ class PostgresRepository:
         self.session = session
         self.config = config
 
-    async def __create_models(self, models: list[ModelType]) -> list[Entity]:
+    async def _create_models(self, models: list[ModelType]) -> list[Entity]:
         try:
             query = self.config.get_insert_many_query(models)
             return await self.get_entities_from_query(query)
@@ -39,7 +37,7 @@ class PostgresRepository:
     async def create(self, model: ModelType) -> Entity:
         try:
             self.session.add(model)
-            if self.__should_commit():
+            if self._should_commit():
                 await self.session.commit()
             await self.session.merge(model)
             return await self.read(self.config.extract_id_from_model(model))
@@ -84,18 +82,18 @@ class PostgresRepository:
 
     async def create_many_from_dto(self, dtos: list[CreateDto]) -> list[Entity]:
         models = [self.config.create_model_mapper(dto) for dto in dtos]
-        return await self.__create_models(models)
+        return await self._create_models(models)
 
     async def create_many_from_entity(self, dtos: list[CreateDto]) -> list[Entity]:
         models = [self.config.model_mapper(dto) for dto in dtos]
-        return await self.__create_models(models)
+        return await self._create_models(models)
 
     async def update(self, entity: Entity) -> Entity:
         await self.read(self.config.extract_id_from_entity(entity))
 
         model = self.config.model_mapper(entity)
         await self.session.merge(model)
-        if self.__should_commit():
+        if self._should_commit():
             await self.session.commit()
         return self.config.entity_mapper(model)
 
@@ -104,12 +102,12 @@ class PostgresRepository:
             self.config.model, self.config.extract_id_from_entity(entity)
         ):
             await self.session.delete(model)
-            if self.__should_commit():
+            if self._should_commit():
                 await self.session.commit()
             return entity
         raise self.config.not_found_exception()
 
-    def __should_commit(self) -> bool:
+    def _should_commit(self) -> bool:
         return not self.session.in_nested_transaction()
 
 
@@ -121,14 +119,12 @@ class CRUDDatabaseRepository(
         ModelType,
         NotFoundException,
         AlreadyExistsException,
-        CreateMapper,
-        EntityMapper,
-        ModelMapper,
     ],
 ):
     """Репозиторий для работы с пользователями в базе данных."""
 
-    _config_type = TypeVar(bound=CRUDRepositoryConfig)
+    _mapper: MapperConfig
+    _config_type = TypeVar("_config_type", bound=CRUDRepositoryConfig)
 
     def __init__(self, session: AsyncSession):
         """Инициализирует репозиторий пользователей."""
@@ -140,10 +136,7 @@ class CRUDDatabaseRepository(
             ModelType,
             NotFoundException,
             AlreadyExistsException,
-            CreateMapper,
-            EntityMapper,
-            ModelMapper,
-        ]()
+        ](mapper=self._mapper)
         self._repository = PostgresRepository(session, self._config)
 
     # region queries

@@ -11,10 +11,10 @@ class CategoryDatabaseModel(Base):
     Основная модель категории в базе данных.
     """
 
-    __tablename__ = "posts"
+    __tablename__ = "categories"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[bool] = mapped_column(default=True)
+    title: Mapped[str] = mapped_column(default=True)
     description: Mapped[str] = mapped_column(unique=True)
 
     created_at: Mapped[datetime] = mapped_column(
@@ -22,9 +22,6 @@ class CategoryDatabaseModel(Base):
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
-    )
-    posts: Mapped[list["PostDatabaseModel"]] = relationship(
-        back_populates="category", lazy="noload"
     )
 
 
@@ -37,7 +34,7 @@ class PostDatabaseModel(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     body: Mapped[str] = mapped_column(unique=True)
-    title: Mapped[bool] = mapped_column(default=True)
+    title: Mapped[str] = mapped_column(default=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
@@ -47,6 +44,4 @@ class PostDatabaseModel(Base):
     )
 
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
-    category: Mapped[CategoryDatabaseModel] = relationship(
-        back_populates="posts", lazy="joined"
-    )
+    category: Mapped[CategoryDatabaseModel] = relationship(uselist=False, lazy="joined")

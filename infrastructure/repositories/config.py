@@ -18,20 +18,32 @@ AlreadyExistsException = TypeVar(
     "AlreadyExistsException", bound=EntityAlreadyExistsError
 )
 
-EntityMapper = Callable[[ModelType], Entity]
-ModelMapper = Callable[[Entity], ModelType]
-CreateMapper = Callable[[CreateDto], ModelType]
+
+@dataclass
+class MapperConfig:
+    create_mapper: Callable[[CreateDto], ModelType]
+    entity_mapper: Callable[[ModelType], Entity]
+    model_mapper: Callable[[Entity], ModelType]
 
 
 @dataclass
-class PostgresRepositoryConfig(Generic[ModelType, Entity, Id, CreateDto]):
+class PostgresRepositoryConfig(
+    Generic[
+        CreateDto,
+        ReadAllDto,
+        Entity,
+        ModelType,
+        NotFoundException,
+        AlreadyExistsException,
+    ]
+):
     model: type[ModelType]
     entity: type[Entity]
     entity_mapper: Callable[[ModelType], Entity]
     model_mapper: Callable[[Entity], ModelType]
     create_model_mapper: Callable[[CreateDto], ModelType]
-    not_found_exception: type[EntityNotFoundError] = EntityNotFoundError
-    already_exists_exception: type[EntityAlreadyExistsError] = EntityAlreadyExistsError
+    not_found_exception: type[NotFoundException] = NotFoundException
+    already_exists_exception: type[AlreadyExistsException] = AlreadyExistsException
 
     def extract_id_from_entity(self, entity: Entity) -> Id:  # noqa: PEP-484
         return entity.id
@@ -72,42 +84,37 @@ class PostgresRepositoryConfig(Generic[ModelType, Entity, Id, CreateDto]):
     def _add_where_id(
         self, statement: Select | Update | Delete, model_id: Id
     ) -> Select | Update | Delete:
-        return statement.where(self.model.id == model_id)
+        return statement.where(self.model.id == model_id)  # type: ignore
 
 
 class CRUDRepositoryConfig(
-    Generic[
+    PostgresRepositoryConfig[
         CreateDto,
         ReadAllDto,
         Entity,
         ModelType,
         NotFoundException,
         AlreadyExistsException,
-        CreateMapper,
-        EntityMapper,
-        ModelMapper,
     ],
-    PostgresRepositoryConfig,
 ):
     """Конфигурация репозитория пользователей."""
 
-    def __init__(self):
+    def __init__(self, mapper: MapperConfig):
         """Инициализирует конфигурацию маппинга пользователей."""
 
         super().__init__(
             model=ModelType,
             entity=Entity,
-            entity_mapper=EntityMapper,
-            model_mapper=ModelMapper,
-            create_model_mapper=CreateMapper,
+            entity_mapper=mapper.entity_mapper,
+            model_mapper=mapper.model_mapper,
+            create_model_mapper=mapper.create_mapper,
             not_found_exception=NotFoundException,
             already_exists_exception=AlreadyExistsException,
         )
 
     def get_select_all_query(self, dto: ReadAllDto) -> Select:
-        return (
-            select(self.model)
-            .order_by(self.model.id)
-            .offset(dto.page * dto.page_size)
-            .limit(dto.page_size)
-        )
+        query = select(self.model).order_by(self.model.id)
+        if getattr(dto, "page") is int and getattr(dto, "page_size") is int:
+            query = query.offset(dto.page * dto.page_size).limit(dto.page_size)
+
+        return query

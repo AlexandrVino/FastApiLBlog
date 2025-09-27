@@ -20,7 +20,11 @@ class PostsService:
         self._repository = repository
         self._transaction = tx
 
-    async def create(self, dto: dtos.CreatePostDto) -> entities.Post:
+    async def create(self, dto: dtos.CreatePostDto, actor: User) -> entities.Post:
+        self._builder.providers(PostsPermissionProvider(actor=actor, entity=None)).add(
+            PermissionsEnum.CAN_CREATE_POSTS
+        ).apply()
+
         return await self._repository.create(dto)
 
     async def read(self, post_id: int, actor: User) -> entities.Post:
@@ -31,7 +35,7 @@ class PostsService:
         return await self._repository.read(post_id)
 
     async def read_all(
-        self, dto: dtos.ReadAllPostsDto, actor: User
+        self, dto: dtos.ReadAllPostsDto | None, actor: User
     ) -> list[entities.Post]:
         self._builder.providers(PostsPermissionProvider(actor=actor, entity=None)).add(
             PermissionsEnum.CAN_READ_ALL_POSTS
@@ -73,7 +77,13 @@ class CategoriesService:
         self._repository = repository
         self._transaction = tx
 
-    async def create(self, dto: dtos.CreateCategoryDto) -> entities.Category:
+    async def create(
+        self, dto: dtos.CreateCategoryDto, actor: User
+    ) -> entities.Category:
+        self._builder.providers(
+            CategoriesPermissionProvider(actor=actor, entity=None)
+        ).add(PermissionsEnum.CAN_CREATE_CATEGORIES).apply()
+
         return await self._repository.create(dto)
 
     async def read(self, category_id: int, actor: User) -> entities.Category:
@@ -84,7 +94,7 @@ class CategoriesService:
         return await self._repository.read(category_id)
 
     async def read_all(
-        self, dto: dtos.ReadAllCategoriesDto, actor: User
+        self, dto: dtos.ReadAllCategoriesDto | None, actor: User
     ) -> list[entities.Category]:
         self._builder.providers(PostsPermissionProvider(actor=actor, entity=None)).add(
             PermissionsEnum.CAN_READ_ALL_CATEGORIES

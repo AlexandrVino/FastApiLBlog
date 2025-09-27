@@ -19,9 +19,9 @@ class UpdateCategoryDto(CamelModel):
 
 
 class CategoryModel(CamelModel):
+    id: int
     title: str
     description: str
-    posts: list["PostModel"] = []
 
 
 class CreatePostDto(CamelModel):
