@@ -8,18 +8,28 @@ from sqlalchemy.sql.base import Executable
 from domain.exceptions import EntityAlreadyExistsError, EntityNotFoundError
 
 Id = TypeVar("Id")
+CreateDto = TypeVar("CreateDto")
+ReadAllDto = TypeVar("ReadAllDto")
+
 Entity = TypeVar("Entity")
 ModelType = TypeVar("ModelType")
-CreateModelType = TypeVar("CreateModelType")
+NotFoundException = TypeVar("NotFoundException", bound=EntityNotFoundError)
+AlreadyExistsException = TypeVar(
+    "AlreadyExistsException", bound=EntityAlreadyExistsError
+)
+
+EntityMapper = Callable[[ModelType], Entity]
+ModelMapper = Callable[[Entity], ModelType]
+CreateMapper = Callable[[CreateDto], ModelType]
 
 
 @dataclass
-class PostgresRepositoryConfig(Generic[ModelType, Entity, Id, CreateModelType]):
+class PostgresRepositoryConfig(Generic[ModelType, Entity, Id, CreateDto]):
     model: type[ModelType]
     entity: type[Entity]
     entity_mapper: Callable[[ModelType], Entity]
     model_mapper: Callable[[Entity], ModelType]
-    create_model_mapper: Callable[[CreateModelType], ModelType]
+    create_model_mapper: Callable[[CreateDto], ModelType]
     not_found_exception: type[EntityNotFoundError] = EntityNotFoundError
     already_exists_exception: type[EntityAlreadyExistsError] = EntityAlreadyExistsError
 
@@ -63,3 +73,41 @@ class PostgresRepositoryConfig(Generic[ModelType, Entity, Id, CreateModelType]):
         self, statement: Select | Update | Delete, model_id: Id
     ) -> Select | Update | Delete:
         return statement.where(self.model.id == model_id)
+
+
+class CRUDRepositoryConfig(
+    Generic[
+        CreateDto,
+        ReadAllDto,
+        Entity,
+        ModelType,
+        NotFoundException,
+        AlreadyExistsException,
+        CreateMapper,
+        EntityMapper,
+        ModelMapper,
+    ],
+    PostgresRepositoryConfig,
+):
+    """Конфигурация репозитория пользователей."""
+
+    def __init__(self):
+        """Инициализирует конфигурацию маппинга пользователей."""
+
+        super().__init__(
+            model=ModelType,
+            entity=Entity,
+            entity_mapper=EntityMapper,
+            model_mapper=ModelMapper,
+            create_model_mapper=CreateMapper,
+            not_found_exception=NotFoundException,
+            already_exists_exception=AlreadyExistsException,
+        )
+
+    def get_select_all_query(self, dto: ReadAllDto) -> Select:
+        return (
+            select(self.model)
+            .order_by(self.model.id)
+            .offset(dto.page * dto.page_size)
+            .limit(dto.page_size)
+        )

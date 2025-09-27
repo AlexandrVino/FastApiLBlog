@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 
 from domain.posts.entities import Category
-from domain.users.enums import RoleEnum
 
 
 @dataclass
