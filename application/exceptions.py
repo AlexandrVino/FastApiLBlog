@@ -1,0 +1,2 @@
+class InvalidServiceAttrsException(Exception):
+    pass
