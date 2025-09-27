@@ -1,4 +1,5 @@
 from domain.users.entities import User
+
 from ..users.dtos import CreateUserDto
 from ..users.exceptions import UserNotFoundError
 from ..users.services import UsersService
@@ -26,10 +27,10 @@ class AuthService:
         except UserNotFoundError:
             raise InvalidCredentialsError("email")
 
-    async def register(self, dto: RegisterUserDto) -> User:
+    async def register(self, dto: RegisterUserDto) -> tuple[User, TokenPairDto]:
         user = await self._create_user(dto)
         # TODO: add email confirmation: and remove returning user
-        return user
+        return user, await self._create_token_pair(user)
 
     async def _create_user(self, dto: RegisterUserDto):
         password_dto = self._security_gateway.create_hashed_password(dto.password)

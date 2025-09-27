@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
-from domain.users.entities import User
 from domain.exceptions import Entity
+from domain.users.entities import User
 
 from ..enums import PermissionsEnum
 

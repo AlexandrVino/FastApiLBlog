@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 from domain.users import entities
+
 from . import dtos
 
 

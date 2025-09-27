@@ -1,6 +1,6 @@
 from application.transactions import TransactionsGateway
-
 from domain.users.entities import User
+
 from ..auth.enums import PermissionsEnum
 from ..auth.permissions import PermissionBuilder
 from .dtos import CreateUserDto, ReadAllUsersDto, UpdateUserDto

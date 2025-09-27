@@ -1,5 +1,4 @@
 from domain.exceptions import EntityAlreadyExistsError, EntityNotFoundError
-
 from domain.users.entities import User
 
 

@@ -1,5 +1,6 @@
 from domain.users.entities import User
 from domain.users.enums import RoleEnum
+
 from ..auth.enums import PermissionsEnum
 from ..auth.permissions import PermissionProvider
 
