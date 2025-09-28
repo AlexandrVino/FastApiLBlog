@@ -17,7 +17,7 @@ async def read_all_posts(
 ):
     """Возвращает данные текущего аутентифицированного пользователя."""
 
-    return map(mappers.post__map_to_pydantic, await posts.read_all(None, actor))
+    return map(mappers.post__map_to_pydantic, await posts.read_all(None))
 
 
 @router.post("/", response_model=dtos.PostModel)
@@ -39,7 +39,7 @@ async def read_post(
 ):
     """Возвращает данные текущего аутентифицированного пользователя."""
 
-    return mappers.post__map_to_pydantic(await posts.read(post_id, actor))
+    return mappers.post__map_to_pydantic(await posts.read(post_id))
 
 
 @router.put("/{post_id}", response_model=dtos.PostModel)

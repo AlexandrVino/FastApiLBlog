@@ -19,7 +19,10 @@ class PostsPermissionProvider(RolePermissionProvider):
             PermissionsEnum.CAN_READ_POSTS,
             PermissionsEnum.CAN_READ_ALL_POSTS,
         },
-        RoleEnum.PUBLIC: set(),
+        RoleEnum.PUBLIC: {
+            PermissionsEnum.CAN_READ_POSTS,
+            PermissionsEnum.CAN_READ_ALL_POSTS,
+        },
     }
 
 
@@ -38,5 +41,8 @@ class CategoriesPermissionProvider(RolePermissionProvider):
             PermissionsEnum.CAN_READ_CATEGORIES,
             PermissionsEnum.CAN_READ_ALL_CATEGORIES,
         },
-        RoleEnum.PUBLIC: set(),
+        RoleEnum.PUBLIC: {
+            PermissionsEnum.CAN_READ_CATEGORIES,
+            PermissionsEnum.CAN_READ_ALL_CATEGORIES,
+        },
     }

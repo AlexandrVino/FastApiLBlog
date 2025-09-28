@@ -1,5 +1,5 @@
 import traceback
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic
 
 from sqlalchemy import Insert, Select, Update
 from sqlalchemy.exc import IntegrityError
@@ -11,7 +11,6 @@ from .config import (
     CRUDRepositoryConfig,
     Entity,
     Id,
-    MapperConfig,
     ModelType,
     NotFoundException,
     ReadAllDto,
@@ -27,8 +26,11 @@ class PostgresRepository:
 
     async def _create_models(self, models: list[ModelType]) -> list[Entity]:
         try:
-            query = self.config.get_insert_many_query(models)
-            return await self.get_entities_from_query(query)
+            self.session.add_all(models)
+            await self.session.flush()
+            for m in models:
+                await self.session.refresh(m)
+            return [self.config.entity_mapper(m) for m in models]
         except IntegrityError:
             traceback.print_exc()
             raise self.config.already_exists_exception()
@@ -36,10 +38,9 @@ class PostgresRepository:
     async def create(self, model: ModelType) -> Entity:
         try:
             self.session.add(model)
-            if self._should_commit():
-                await self.session.commit()
-            await self.session.merge(model)
-            return await self.read(self.config.extract_id_from_model(model))
+            await self.session.flush()
+            await self.session.refresh(model)
+            return self.config.entity_mapper(model)
         except IntegrityError:
             traceback.print_exc()
             raise self.config.already_exists_exception()
@@ -83,29 +84,26 @@ class PostgresRepository:
         models = [self.config.create_mapper(dto) for dto in dtos]
         return await self._create_models(models)
 
-    async def create_many_from_entity(self, dtos: list[CreateDto]) -> list[Entity]:
-        models = [self.config.model_mapper(dto) for dto in dtos]
+    async def create_many_from_entity(self, entities: list[Entity]) -> list[Entity]:
+        models = [self.config.model_mapper(e) for e in entities]
         return await self._create_models(models)
 
     async def update(self, entity: Entity) -> Entity:
         model = self.config.model_mapper(entity)
-        await self.session.merge(model)
-        if self._should_commit():
-            await self.session.commit()
-        return self.config.entity_mapper(model)
+        merged = await self.session.merge(model)
+        await self.session.flush()
+        await self.session.refresh(merged)
+        return self.config.entity_mapper(merged)
 
     async def delete(self, entity: Entity) -> Entity:
-        if model := await self.session.get(
+        model = await self.session.get(
             self.config.model, self.config.extract_id_from_entity(entity)
-        ):
-            await self.session.delete(model)
-            if self._should_commit():
-                await self.session.commit()
-            return entity
-        raise self.config.not_found_exception()
-
-    def _should_commit(self) -> bool:
-        return not self.session.in_nested_transaction()
+        )
+        if not model:
+            raise self.config.not_found_exception()
+        await self.session.delete(model)
+        await self.session.flush()
+        return entity
 
 
 class CRUDDatabaseRepository(

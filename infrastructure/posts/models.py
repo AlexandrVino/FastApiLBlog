@@ -14,8 +14,8 @@ class CategoryDatabaseModel(Base):
     __tablename__ = "categories"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(default=True)
-    description: Mapped[str] = mapped_column(unique=True)
+    title: Mapped[str] = mapped_column()
+    description: Mapped[str] = mapped_column()
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
@@ -33,8 +33,8 @@ class PostDatabaseModel(Base):
     __tablename__ = "posts"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    body: Mapped[str] = mapped_column(unique=True)
-    title: Mapped[str] = mapped_column(default=True)
+    body: Mapped[str] = mapped_column()
+    title: Mapped[str] = mapped_column()
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

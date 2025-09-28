@@ -17,9 +17,7 @@ async def read_all_categories(
 ):
     """Возвращает данные текущего аутентифицированного пользователя."""
 
-    return map(
-        mappers.category__map_to_pydantic, await categories.read_all(None, actor)
-    )
+    return map(mappers.category__map_to_pydantic, await categories.read_all(None))
 
 
 @router.post("/", response_model=dtos.CategoryModel)
@@ -41,7 +39,7 @@ async def read_category(
 ):
     """Возвращает данные текущего аутентифицированного пользователя."""
 
-    return mappers.category__map_to_pydantic(await categories.read(category_id, actor))
+    return mappers.category__map_to_pydantic(await categories.read(category_id))
 
 
 @router.put("/{category_id}", response_model=dtos.CategoryModel)

@@ -1,4 +1,3 @@
-import asyncio
 from typing import AsyncIterable
 
 from dishka import Provider, Scope, provide
@@ -10,35 +9,29 @@ from ..transactions import TransactionsDatabaseGateway, TransactionsGateway
 
 
 class DatabaseProvider(Provider):
-    """
-    Провайдер зависимостей для работы с базой данных.
-
-    Предоставляет зависимости для подключения к PostgreSQL, управления сессиями
-    и транзакциями с различными областями видимости (scope).
-    """
-
     @provide(scope=Scope.APP)
     def get_engine(self, config: Config) -> AsyncEngine:
-        """Создает и предоставляет асинхронный движок SQLAlchemy."""
-
         return get_engine(str(config.postgres_url))
 
     @provide(scope=Scope.APP)
-    def get_session_maker(self, engine: AsyncEngine) -> async_sessionmaker:
-        """Предоставляет фабрику сессий SQLAlchemy."""
-
+    def get_session_maker(
+        self, engine: AsyncEngine
+    ) -> async_sessionmaker[AsyncSession]:
         return get_session_maker(engine)
 
     @provide(scope=Scope.REQUEST)
     async def get_session(
         self, session_maker: async_sessionmaker[AsyncSession]
     ) -> AsyncIterable[AsyncSession]:
-        """Предоставляет асинхронную сессию для работы с БД."""
-
-        async with session_maker(expire_on_commit=False) as session:
-            yield session
-            await session.commit()
-        await asyncio.shield(session.close())
+        session: AsyncSession = session_maker(expire_on_commit=False)
+        try:
+            async with session.begin():
+                yield session
+        except Exception:
+            await session.rollback()
+            raise
+        finally:
+            await session.close()
 
     @provide(scope=Scope.REQUEST)
     async def get_transaction(self, session: AsyncSession) -> TransactionsGateway:
