@@ -34,6 +34,15 @@ class PostsService:
 
         return await self._repository.read(post_id)
 
+    async def read_by_category(
+        self, category_id: int, actor: User
+    ) -> list[entities.Post]:
+        self._builder.providers(PostsPermissionProvider(actor=actor, entity=None)).add(
+            PermissionsEnum.CAN_READ_ALL_POSTS
+        ).apply()
+
+        return await self._repository.read_by_category(category_id)
+
     async def read_all(
         self, dto: dtos.ReadAllPostsDto | None, actor: User
     ) -> list[entities.Post]:
@@ -52,7 +61,7 @@ class PostsService:
             post = await self.read(dto.id, actor=actor)
             post.title = dto.title
             post.body = dto.body
-            post.category = dto.category
+            post.category_id = dto.category_id
 
             return await self._repository.update(post)
 
@@ -96,18 +105,18 @@ class CategoriesService:
     async def read_all(
         self, dto: dtos.ReadAllCategoriesDto | None, actor: User
     ) -> list[entities.Category]:
-        self._builder.providers(PostsPermissionProvider(actor=actor, entity=None)).add(
-            PermissionsEnum.CAN_READ_ALL_CATEGORIES
-        ).apply()
+        self._builder.providers(
+            CategoriesPermissionProvider(actor=actor, entity=None)
+        ).add(PermissionsEnum.CAN_READ_ALL_CATEGORIES).apply()
 
         return await self._repository.read_all(dto)
 
     async def update(
         self, dto: dtos.UpdateCategoryDto, actor: User
     ) -> entities.Category:
-        self._builder.providers(PostsPermissionProvider(actor=actor, entity=None)).add(
-            PermissionsEnum.CAN_UPDATE_CATEGORIES
-        ).apply()
+        self._builder.providers(
+            CategoriesPermissionProvider(actor=actor, entity=None)
+        ).add(PermissionsEnum.CAN_UPDATE_CATEGORIES).apply()
 
         async with self._transaction:
             category = await self.read(dto.id, actor=actor)
@@ -117,9 +126,9 @@ class CategoriesService:
             return await self._repository.update(category)
 
     async def delete(self, category_id: int, actor: User) -> entities.Category:
-        self._builder.providers(PostsPermissionProvider(actor=actor, entity=None)).add(
-            PermissionsEnum.CAN_DELETE_CATEGORIES
-        ).apply()
+        self._builder.providers(
+            CategoriesPermissionProvider(actor=actor, entity=None)
+        ).add(PermissionsEnum.CAN_DELETE_CATEGORIES).apply()
 
         async with self._transaction:
             category = await self.read(category_id, actor=actor)

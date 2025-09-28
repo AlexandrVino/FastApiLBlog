@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Callable, Generic, TypeVar
+from typing import Any, Callable, Generic, TypeVar, get_args, get_origin
 
 from sqlalchemy import Delete, Insert, Select, Update, insert, select
 from sqlalchemy.orm.interfaces import LoaderOption
@@ -27,7 +27,7 @@ class MapperConfig:
 
 
 @dataclass
-class PostgresRepositoryConfig(
+class CRUDRepositoryConfig(
     Generic[
         CreateDto,
         ReadAllDto,
@@ -37,11 +37,12 @@ class PostgresRepositoryConfig(
         AlreadyExistsException,
     ]
 ):
+    read_all_dto: type[ReadAllDto]
     model: type[ModelType]
     entity: type[Entity]
     entity_mapper: Callable[[ModelType], Entity]
     model_mapper: Callable[[Entity], ModelType]
-    create_model_mapper: Callable[[CreateDto], ModelType]
+    create_mapper: Callable[[CreateDto], ModelType]
     not_found_exception: type[NotFoundException] = NotFoundException
     already_exists_exception: type[AlreadyExistsException] = AlreadyExistsException
 
@@ -65,8 +66,12 @@ class PostgresRepositoryConfig(
             if getattr(model, column.key) is not None
         }
 
-    def get_select_query(self, model_id: Id) -> Select:
-        return self._add_where_id(select(self.model), model_id)
+    def get_select_all_query(self, dto: ReadAllDto) -> Select:
+        query = select(self.model).order_by(self.model.id)
+        if getattr(dto, "page") is int and getattr(dto, "page_size") is int:
+            query = query.offset(dto.page * dto.page_size).limit(dto.page_size)
+
+        return query
 
     def get_default_select_all_query(self, ids: list[Id]) -> Select:
         return select(self.model).where(self.model.id.in_(ids)).order_by(self.model.id)
@@ -85,36 +90,3 @@ class PostgresRepositoryConfig(
         self, statement: Select | Update | Delete, model_id: Id
     ) -> Select | Update | Delete:
         return statement.where(self.model.id == model_id)  # type: ignore
-
-
-class CRUDRepositoryConfig(
-    PostgresRepositoryConfig[
-        CreateDto,
-        ReadAllDto,
-        Entity,
-        ModelType,
-        NotFoundException,
-        AlreadyExistsException,
-    ],
-):
-    """Конфигурация репозитория пользователей."""
-
-    def __init__(self, mapper: MapperConfig):
-        """Инициализирует конфигурацию маппинга пользователей."""
-
-        super().__init__(
-            model=ModelType,
-            entity=Entity,
-            entity_mapper=mapper.entity_mapper,
-            model_mapper=mapper.model_mapper,
-            create_model_mapper=mapper.create_mapper,
-            not_found_exception=NotFoundException,
-            already_exists_exception=AlreadyExistsException,
-        )
-
-    def get_select_all_query(self, dto: ReadAllDto) -> Select:
-        query = select(self.model).order_by(self.model.id)
-        if getattr(dto, "page") is int and getattr(dto, "page_size") is int:
-            query = query.offset(dto.page * dto.page_size).limit(dto.page_size)
-
-        return query

@@ -14,15 +14,14 @@ from .config import (
     MapperConfig,
     ModelType,
     NotFoundException,
-    PostgresRepositoryConfig,
     ReadAllDto,
 )
 
 
 class PostgresRepository:
-    config: PostgresRepositoryConfig
+    config: CRUDRepositoryConfig
 
-    def __init__(self, session: AsyncSession, config: PostgresRepositoryConfig):
+    def __init__(self, session: AsyncSession, config: CRUDRepositoryConfig):
         self.session = session
         self.config = config
 
@@ -75,13 +74,13 @@ class PostgresRepository:
         )
 
     async def create_from_dto(self, dto: CreateDto) -> Entity:
-        return await self.create(self.config.create_model_mapper(dto))
+        return await self.create(self.config.create_mapper(dto))
 
     async def create_from_entity(self, entity: Entity) -> Entity:
         return await self.create(self.config.model_mapper(entity))
 
     async def create_many_from_dto(self, dtos: list[CreateDto]) -> list[Entity]:
-        models = [self.config.create_model_mapper(dto) for dto in dtos]
+        models = [self.config.create_mapper(dto) for dto in dtos]
         return await self._create_models(models)
 
     async def create_many_from_entity(self, dtos: list[CreateDto]) -> list[Entity]:
@@ -89,8 +88,6 @@ class PostgresRepository:
         return await self._create_models(models)
 
     async def update(self, entity: Entity) -> Entity:
-        await self.read(self.config.extract_id_from_entity(entity))
-
         model = self.config.model_mapper(entity)
         await self.session.merge(model)
         if self._should_commit():
@@ -123,20 +120,11 @@ class CRUDDatabaseRepository(
 ):
     """Репозиторий для работы с пользователями в базе данных."""
 
-    _mapper: MapperConfig
-    _config_type = TypeVar("_config_type", bound=CRUDRepositoryConfig)
+    _config: CRUDRepositoryConfig
 
     def __init__(self, session: AsyncSession):
         """Инициализирует репозиторий пользователей."""
 
-        self._config = self._config_type[
-            CreateDto,
-            ReadAllDto,
-            Entity,
-            ModelType,
-            NotFoundException,
-            AlreadyExistsException,
-        ](mapper=self._mapper)
         self._repository = PostgresRepository(session, self._config)
 
     # region queries
@@ -155,7 +143,7 @@ class CRUDDatabaseRepository(
     async def create(self, dto: ReadAllDto) -> Entity:
         """Создает нового пользователя с паролем."""
 
-        return await self._repository.create(self._config.create_model_mapper(dto))
+        return await self._repository.create(self._config.create_mapper(dto))
 
     async def update(self, entity: Entity) -> Entity:
         """Обновляет данные пользователя."""

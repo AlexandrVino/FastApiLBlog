@@ -21,9 +21,11 @@ class UsersPermissionProvider(PermissionProvider):
             PermissionsEnum.CAN_DELETE_USERS,
         },
         RoleEnum.USER: {
+            # по идее тут надо еще разрешения на чтение и удаление,
+            # но в силу текущего решения получится 2 разных сценария использования одного юзкейса
+            # т.е. надо перепроектировать решение, сходу я не придумал как именно (без костылей)
+            # решил не тратить время
             PermissionsEnum.CAN_CREATE_USERS,
-            PermissionsEnum.CAN_READ_USERS,
-            PermissionsEnum.CAN_DELETE_USERS,
         },
         RoleEnum.PUBLIC: {PermissionsEnum.CAN_CREATE_USERS},
     }

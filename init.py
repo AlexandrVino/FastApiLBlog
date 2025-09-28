@@ -27,10 +27,6 @@ async def _create_admin(
         return await auth._create_user(dto)  # noqa
 
 
-async def _make_user_active(user: User, users_repository: UsersRepository):
-    await users_repository._change_user_active_status(user.id, True)  # noqa
-
-
 async def init(container: AsyncContainer):
     async with container() as nested:
         config = await nested.get(Config)
@@ -38,10 +34,6 @@ async def init(container: AsyncContainer):
 
         users_repository = await nested.get(UsersRepository)
         admin = await _create_admin(config, users_repository, auth)
-
-    async with container() as nested:
-        users_repository = await nested.get(UsersRepository)
-        await _make_user_active(admin, users_repository)
 
 
 if __name__ == "__main__":

@@ -65,7 +65,12 @@ post__map_to_db = pgsql_retort.get_converter(
         link_function(
             lambda post: post.category.id,
             P[PostDatabaseModel].category_id,
-        )
+        ),
+        coercer(
+            Category,
+            CategoryDatabaseModel,
+            category__map_to_db,
+        ),
     ],
 )
 post__create_mapper = pgsql_retort.get_converter(
@@ -75,13 +80,14 @@ post__create_mapper = pgsql_retort.get_converter(
         allow_unlinked_optional(P[PostDatabaseModel].id),
         allow_unlinked_optional(P[PostDatabaseModel].created_at),
         allow_unlinked_optional(P[PostDatabaseModel].updated_at),
-        link_function(
-            lambda post: post.category.id,
-            P[PostDatabaseModel].category_id,
-        ),
+        allow_unlinked_optional(P[PostDatabaseModel].category),
     ],
 )
-post__map_to_pydantic = py_retort.get_converter(Post, models.PostModel)
+post__map_to_pydantic = py_retort.get_converter(
+    Post,
+    models.PostModel,
+    recipe=[coercer(Category, models.CategoryModel, category__map_to_pydantic)],
+)
 
 
 @py_retort.impl_converter(

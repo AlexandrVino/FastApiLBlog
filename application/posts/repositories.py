@@ -31,7 +31,8 @@ class PostsRepository(
     CRUDRepository[entities.Post, dtos.CreatePostDto, dtos.ReadAllPostsDto],
     metaclass=ABCMeta,
 ):
-    pass
+    @abstractmethod
+    async def read_by_category(self, category_id: int) -> list[entities.Post]: ...
 
 
 class CategoriesRepository(

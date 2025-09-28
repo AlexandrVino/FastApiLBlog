@@ -8,7 +8,7 @@ from domain.users.entities import User
 from infrastructure.auth.deps import get_user
 from infrastructure.posts import dtos, mappers
 
-router = APIRouter(route_class=DishkaRoute, prefix="/categories")
+router = APIRouter(route_class=DishkaRoute)
 
 
 @router.get("/", response_model=list[dtos.CategoryModel])

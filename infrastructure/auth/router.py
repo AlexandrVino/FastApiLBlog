@@ -75,5 +75,5 @@ async def refresh_token(
 
     Генерирует новую пару токенов на основе валидного refresh-токена.
     """
-    user, tokens_pair = await auth.authorize(token_info)
+    user, tokens_pair = await auth.login(token_info)
     return _make_response(user, tokens_pair)

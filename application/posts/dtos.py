@@ -1,13 +1,11 @@
 from dataclasses import dataclass
 
-from domain.posts.entities import Category
-
 
 @dataclass
 class CreatePostDto:
     body: str
     title: str
-    category: Category
+    category_id: int
 
 
 @dataclass
@@ -21,7 +19,7 @@ class UpdatePostDto:
     id: int
     body: str
     title: str
-    category: Category
+    category_id: int
 
 
 @dataclass

@@ -1,7 +1,11 @@
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import PostgresDsn, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+BACKEND_PATH = Path(__file__).parent.parent.resolve()
+STATIC_PATH = BACKEND_PATH / "static"
 
 
 class Config(BaseSettings):
@@ -16,7 +20,10 @@ class Config(BaseSettings):
         env_file=".env", env_file_encoding="utf-8", extra="allow"
     )
 
-    cors_origins: list[str] = ["http://localhost:5173", "http://localhost:5000"]
+    cors_origins: list[str] = [
+        "http://localhost:5173",
+        "http://localhost:5000",
+    ]
 
     server_host: str = "localhost"
     server_port: int = 5000

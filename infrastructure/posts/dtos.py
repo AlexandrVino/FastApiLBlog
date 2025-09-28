@@ -27,7 +27,7 @@ class CategoryModel(CamelModel):
 class CreatePostDto(CamelModel):
     body: str
     title: str
-    category: Category
+    category_id: int
 
 
 class ReadAllPostsDto(CamelModel):
@@ -39,7 +39,7 @@ class UpdatePostDto(CamelModel):
     id: int
     body: str
     title: str
-    category: Category
+    category_id: int
 
 
 class PostModel(CamelModel):

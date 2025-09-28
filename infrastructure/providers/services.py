@@ -1,6 +1,7 @@
 from dishka import Provider, Scope, provide
 
 from application.auth.services import AuthService
+from application.posts.services import CategoriesService, PostsService
 from application.users.services import UsersService
 
 
@@ -17,3 +18,5 @@ class ServiceProvider(Provider):
 
     auth = provide(AuthService)
     users = provide(UsersService)
+    posts = provide(PostsService)
+    categories = provide(CategoriesService)

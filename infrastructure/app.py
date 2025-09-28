@@ -5,10 +5,11 @@ from dishka import AsyncContainer
 from dishka.integrations.fastapi import setup_dishka
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from starlette.staticfiles import StaticFiles
 
 from .background_tasks import BackgroundTaskRunner
-from .config import Config
+from .config import STATIC_PATH, Config
 from .exceptions import get_exception_handlers
 from .router import v1_router
 
@@ -54,6 +55,12 @@ def create_app(container: AsyncContainer, config: Config) -> FastAPI:
 
     app.mount("/static", StaticFiles(directory="static"), name="static")
     app.include_router(v1_router, prefix="/api")
+
+    @app.get("/")
+    async def root():
+        with open(STATIC_PATH / "index.html", encoding="utf8") as file:
+            return HTMLResponse(file.read().format(FRONTEND_PATH=STATIC_PATH))
+
     setup_dishka(container, app)
 
     return app

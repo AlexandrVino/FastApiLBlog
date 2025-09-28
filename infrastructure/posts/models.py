@@ -44,4 +44,4 @@ class PostDatabaseModel(Base):
     )
 
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
-    category: Mapped[CategoryDatabaseModel] = relationship(uselist=False, lazy="joined")
+    category: Mapped[CategoryDatabaseModel] = relationship(lazy="joined", viewonly=True)

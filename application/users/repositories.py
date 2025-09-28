@@ -26,8 +26,3 @@ class UsersRepository(metaclass=ABCMeta):
 
     @abstractmethod
     async def delete(self, user: entities.User) -> entities.User: ...
-
-    @abstractmethod
-    async def _change_user_active_status(
-        self, user_id: int, is_active: bool
-    ) -> entities.User: ...

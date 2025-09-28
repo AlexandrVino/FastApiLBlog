@@ -23,18 +23,8 @@ class RepositoryConfig(
         UserAlreadyExistsError,
     ]
 ):
-    def __init__(self):
-        super().__init__(
-            MapperConfig(
-                create_mapper=mappers.user__create_mapper,
-                entity_mapper=mappers.user__map_from_db,
-                model_mapper=mappers.user__map_to_db,
-            )
-        )
-
     def get_select_by_email_query(self, email: str) -> Select:
         """Формирует запрос для поиска пользователя по email."""
-
         return select(self.model).where(self.model.email == email)
 
 
@@ -51,7 +41,16 @@ class UsersDatabaseRepository(
 ):
     """Репозиторий для работы с пользователями в базе данных."""
 
-    _config_type = RepositoryConfig
+    _config = RepositoryConfig(
+        read_all_dto=dtos.CreateUserDto,
+        model=UserDatabaseModel,
+        entity=entities.User,
+        create_mapper=mappers.user__create_mapper,
+        entity_mapper=mappers.user__map_from_db,
+        model_mapper=mappers.user__map_to_db,
+        not_found_exception=UserNotFoundError,
+        already_exists_exception=UserAlreadyExistsError,
+    )
 
     def __init__(self, session: AsyncSession, config: Config):
         """Инициализирует репозиторий пользователей."""
@@ -71,27 +70,12 @@ class UsersDatabaseRepository(
         if model := await self._repository.get_scalar_or_none(
             self._config.get_select_by_email_query(email)
         ):
-            return self._config.model_mapper(model)
+            return self._config.entity_mapper(model)
         raise self._config.not_found_exception
 
     async def get_super_user(self) -> entities.User:
         """Возвращает суперпользователя системы."""
 
         return await self.read_by_email(self._admin_username)
-
-    # endregion
-    # region command
-
-    async def _change_user_active_status(self, user_id: int, is_active: bool):
-        """Изменяет статус активности пользователя."""
-
-        query = (
-            update(self._config.model)
-            .where(self._config.model.id == user_id)  # type: ignore
-            .values(is_active=is_active)
-            .execution_options(synchronize_session="fetch")
-            .returning(self._config.model)
-        )
-        await self._repository.update_by_query(query)
 
     # endregion
