@@ -23,7 +23,7 @@ async function render() {
     } else if (path.startsWith('/posts/')) {
         const id = path.split('/')[2];
         app.innerHTML = await views.postDetail(id);
-    }else if (path.startsWith('/categories/')) {
+    } else if (path.startsWith('/categories/')) {
         const id = path.split('/')[2];
         app.innerHTML = await views.categoryDetail(id);
     } else if (path.startsWith('/admin/posts/')) {

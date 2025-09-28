@@ -10,5 +10,5 @@ RUN poetry install --no-root
 
 
 COPY .. /app
-
+CMD ./run_tests.sh
 CMD ["poetry", "run", "uvicorn", "infrastructure.server:app", "--host", "0.0.0.0", "--port", "8080"]

@@ -1,61 +1,61 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FastAPI Blog — Frontend</title>
-  <link rel="stylesheet" href="static/styles.css"/>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>FastAPI Blog — Frontend</title>
+    <link rel="stylesheet" href="static/styles.css"/>
 </head>
 <body>
-  <header class="container">
+<header class="container">
     <h1>FastAPI Blog</h1>
     <nav id="nav">
-      <a href="#/" data-link>Посты</a>
-      <a href="#/categories" data-link>Категории</a>
-      <span id="adminLinks" class="hidden">
+        <a href="#/" data-link>Посты</a>
+        <a href="#/categories" data-link>Категории</a>
+        <span id="adminLinks" class="hidden">
         <a href="#/admin/posts" data-link>Админ: Посты</a>
         <a href="#/admin/categories" data-link>Админ: Категории</a>
         <a href="#/admin/users" data-link>Админ: Пользователи</a>
       </span>
     </nav>
     <div class="auth">
-      <span id="authUser" class="muted"></span>
-      <button id="btnLogin">Войти</button>
-      <button id="btnRegister" class="secondary">Регистрация</button>
-      <button id="btnLogout" class="danger hidden">Выйти</button>
+        <span id="authUser" class="muted"></span>
+        <button id="btnLogin">Войти</button>
+        <button id="btnRegister" class="secondary">Регистрация</button>
+        <button id="btnLogout" class="danger hidden">Выйти</button>
     </div>
-  </header>
+</header>
 
-  <main id="app" class="container"></main>
+<main id="app" class="container"></main>
 
-  <dialog id="dlgLogin">
+<dialog id="dlgLogin">
     <form id="formLogin" method="dialog">
-      <h3>Вход</h3>
-      <label>Email <input name="email" type="email" required/></label>
-      <label>Пароль <input name="password" type="password" required/></label>
-      <menu>
-        <button type="submit">Войти</button>
-        <button type="button" class="secondary" id="cancelLogin">Отмена</button>
-      </menu>
-      <p class="error" id="loginError"></p>
+        <h3>Вход</h3>
+        <label>Email <input name="email" type="email" required/></label>
+        <label>Пароль <input name="password" type="password" required/></label>
+        <menu>
+            <button type="submit">Войти</button>
+            <button type="button" class="secondary" id="cancelLogin">Отмена</button>
+        </menu>
+        <p class="error" id="loginError"></p>
     </form>
-  </dialog>
+</dialog>
 
-  <dialog id="dlgRegister">
+<dialog id="dlgRegister">
     <form id="formRegister" method="dialog">
-      <h3>Регистрация</h3>
-      <label>Email <input name="email" type="email" required/></label>
-      <label>Пароль <input name="password" type="password" required/></label>
-      <menu>
-        <button type="submit">Создать</button>
-        <button type="button" class="secondary" id="cancelRegister">Отмена</button>
-      </menu>
-      <p class="error" id="registerError"></p>
+        <h3>Регистрация</h3>
+        <label>Email <input name="email" type="email" required/></label>
+        <label>Пароль <input name="password" type="password" required/></label>
+        <menu>
+            <button type="submit">Создать</button>
+            <button type="button" class="secondary" id="cancelRegister">Отмена</button>
+        </menu>
+        <p class="error" id="registerError"></p>
     </form>
-  </dialog>
+</dialog>
 
-  <script src="static/api.js"></script>
-  <script src="static/router.js"></script>
-  <script src="static/app.js"></script>
+<script src="static/api.js"></script>
+<script src="static/router.js"></script>
+<script src="static/app.js"></script>
 </body>
 </html>

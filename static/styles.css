@@ -1,30 +1,167 @@
-:root{
-  --bg:#0b0c10; --card:#15171c; --text:#e5e7eb; --muted:#9ca3af; --acc:#60a5fa; --danger:#ef4444; --ok:#22c55e;
+:root {
+    --bg: #0b0c10;
+    --card: #15171c;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --acc: #60a5fa;
+    --danger: #ef4444;
+    --ok: #22c55e;
 }
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,Segoe UI,Roboto,Inter,Arial}
-a{color:var(--acc);text-decoration:none}
-.container{max-width:960px;margin:0 auto;padding:16px}
-header{display:flex;align-items:center;gap:16px;justify-content:space-between;border-bottom:1px solid #222}
-#nav a{margin-right:12px}
-.auth{display:flex;gap:8px;align-items:center}
-button{padding:8px 12px;border-radius:10px;border:1px solid #2a2f3a;background:#1f232b;color:var(--text);cursor:pointer}
-button:hover{background:#222733}
-button.secondary{background:#171a20}
-button.danger{border-color:#3a1f1f;background:#2a1313}
-.hidden{display:none}
-.card{background:var(--card);border:1px solid #23252c;border-radius:16px;padding:16px;margin:12px 0}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
-label{display:flex;flex-direction:column;gap:6px;margin:6px 0}
-input,textarea,select{background:#11151b;border:1px solid #2a2f3a;color:var(--text);padding:8px 10px;border-radius:8px}
-h1,h2,h3{margin:4px 0 8px}
-.muted{color:var(--muted)}
-.badge{display:inline-block;padding:2px 8px;border-radius:999px;background:#11151b;border:1px solid #2a2f3a;font-size:12px}
-.error{color:var(--danger);min-height:1.2em}
-dialog{border:none;border-radius:16px;padding:0;max-width:420px;width:96%}
-dialog form{padding:16px;background:var(--card);border:1px solid #23252c;border-radius:16px}
-dialog::backdrop{background:rgba(0,0,0,.6)}
-.table{width:100%;border-collapse:collapse}
-.table th,.table td{padding:8px;border-bottom:1px solid #2a2f3a;text-align:left}
-.actions{display:flex;gap:6px;flex-wrap:wrap}
-small{color:var(--muted)}
+
+* {
+    box-sizing: border-box
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.5 system-ui, Segoe UI, Roboto, Inter, Arial
+}
+
+a {
+    color: var(--acc);
+    text-decoration: none
+}
+
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 16px
+}
+
+header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    justify-content: space-between;
+    border-bottom: 1px solid #222
+}
+
+#nav a {
+    margin-right: 12px
+}
+
+.auth {
+    display: flex;
+    gap: 8px;
+    align-items: center
+}
+
+button {
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid #2a2f3a;
+    background: #1f232b;
+    color: var(--text);
+    cursor: pointer
+}
+
+button:hover {
+    background: #222733
+}
+
+button.secondary {
+    background: #171a20
+}
+
+button.danger {
+    border-color: #3a1f1f;
+    background: #2a1313
+}
+
+.hidden {
+    display: none
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid #23252c;
+    border-radius: 16px;
+    padding: 16px;
+    margin: 12px 0
+}
+
+.grid {
+    display: grid;
+    grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px
+}
+
+label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 6px 0
+}
+
+input, textarea, select {
+    background: #11151b;
+    border: 1px solid #2a2f3a;
+    color: var(--text);
+    padding: 8px 10px;
+    border-radius: 8px
+}
+
+h1, h2, h3 {
+    margin: 4px 0 8px
+}
+
+.muted {
+    color: var(--muted)
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #11151b;
+    border: 1px solid #2a2f3a;
+    font-size: 12px
+}
+
+.error {
+    color: var(--danger);
+    min-height: 1.2em
+}
+
+dialog {
+    border: none;
+    border-radius: 16px;
+    padding: 0;
+    max-width: 420px;
+    width: 96%
+}
+
+dialog form {
+    padding: 16px;
+    background: var(--card);
+    border: 1px solid #23252c;
+    border-radius: 16px
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, .6)
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse
+}
+
+.table th, .table td {
+    padding: 8px;
+    border-bottom: 1px solid #2a2f3a;
+    text-align: left
+}
+
+.actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap
+}
+
+small {
+    color: var(--muted)
+}
