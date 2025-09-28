@@ -1,11 +1,11 @@
+import asyncio
 import os
+import sys
 
 import httpx
 import pytest
 
 from infrastructure.config import Config, get_config
-
-import sys, asyncio
 
 if sys.platform.startswith("win"):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
@@ -30,7 +30,7 @@ async def client(base_url: str):
     transport = httpx.ASGITransport(app=app)
 
     async with httpx.AsyncClient(
-            transport=transport, base_url=base_url, timeout=httpx.Timeout(60)
+        transport=transport, base_url=base_url, timeout=httpx.Timeout(60)
     ) as c:
         yield c
 
