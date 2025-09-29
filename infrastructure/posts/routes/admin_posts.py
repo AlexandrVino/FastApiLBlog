@@ -11,57 +11,33 @@ from infrastructure.posts import dtos, mappers
 router = APIRouter(route_class=DishkaRoute)
 
 
-@router.get("/", response_model=list[dtos.PostModel])
-async def read_all_posts(
-    actor: Annotated[User, Depends(get_user)], posts: FromDishka[PostsService]
-):
-    """Возвращает данные текущего аутентифицированного пользователя."""
-
-    return map(mappers.post__map_to_pydantic, await posts.read_all(None))
-
-
-@router.post("/", response_model=dtos.PostModel)
+@router.post("/", response_model=dtos.PostModelDetail)
 async def create_post(
     dto: dtos.CreatePostDto,
     actor: Annotated[User, Depends(get_user)],
     posts: FromDishka[PostsService],
 ):
-    """Возвращает данные текущего аутентифицированного пользователя."""
-
-    return mappers.post__map_to_pydantic(await posts.create(dto, actor))
-
-
-@router.get("/{post_id}", response_model=dtos.PostModel)
-async def read_post(
-    post_id: int,
-    actor: Annotated[User, Depends(get_user)],
-    posts: FromDishka[PostsService],
-):
-    """Возвращает данные текущего аутентифицированного пользователя."""
-
-    return mappers.post__map_to_pydantic(await posts.read(post_id))
+    return mappers.post__map_to_pydantic_detail(
+        await posts.create(mappers.post__create_dto_mapper(dto), actor)
+    )
 
 
-@router.put("/{post_id}", response_model=dtos.PostModel)
+@router.put("/{post_id}", response_model=dtos.PostModelDetail)
 async def update_post(
     post_id: int,
     dto: dtos.UpdatePostDto,
     actor: Annotated[User, Depends(get_user)],
     posts: FromDishka[PostsService],
 ):
-    """Возвращает данные текущего аутентифицированного пользователя."""
-
-    return mappers.post__map_to_pydantic(
+    return mappers.post__map_to_pydantic_detail(
         await posts.update(mappers.post__map_update_dto(dto, post_id), actor)
     )
 
 
-@router.delete("/{post_id}", response_model=dtos.PostModel)
+@router.delete("/{post_id}", response_model=dtos.PostModelDetail)
 async def delete_post(
     post_id: int,
     actor: Annotated[User, Depends(get_user)],
     posts: FromDishka[PostsService],
 ):
-    """Возвращает данные текущего аутентифицированного пользователя."""
-
-    return mappers.post__map_to_pydantic(await posts.delete(post_id, actor))
+    return mappers.post__map_to_pydantic_detail(await posts.delete(post_id, actor))

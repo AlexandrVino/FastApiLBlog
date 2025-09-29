@@ -12,9 +12,7 @@ retort = postgres_retort.extend(recipe=[])
 
 
 user__map_from_db = retort.get_converter(UserDatabaseModel, User)
-
 user__map_to_db = retort.get_converter(User, UserDatabaseModel)
-
 user__create_mapper = retort.get_converter(
     CreateUserDto,
     UserDatabaseModel,

@@ -14,13 +14,13 @@ py_retort = pydantic_retort.extend(recipe=[])
 category__map_from_db = pgsql_retort.get_converter(
     CategoryDatabaseModel,
     Category,
-    recipe=[
-        allow_unlinked_optional(P[models.Category].posts),
-    ],
 )
 category__map_to_db = pgsql_retort.get_converter(Category, CategoryDatabaseModel)
+category__create_dto_mapper = pgsql_retort.get_converter(
+    dtos.CreateCategoryDto, models.CreateCategoryDto
+)
 category__create_mapper = pgsql_retort.get_converter(
-    models.CreateCategoryDto,
+    dtos.CreateCategoryDto,
     CategoryDatabaseModel,
     recipe=[
         allow_unlinked_optional(P[CategoryDatabaseModel].id),
@@ -38,7 +38,7 @@ category__map_to_pydantic = py_retort.get_converter(
     recipe=[
         link_function(
             lambda dto, category_id: category_id,
-            P[models.UpdateCategoryDto].id,
+            P[dtos.UpdateCategoryDto].id,
         )
     ]
 )
@@ -63,7 +63,7 @@ post__map_to_db = pgsql_retort.get_converter(
     PostDatabaseModel,
     recipe=[
         link_function(
-            lambda post: post.category.id,
+            lambda post: post.category_id,
             P[PostDatabaseModel].category_id,
         ),
         coercer(
@@ -73,8 +73,11 @@ post__map_to_db = pgsql_retort.get_converter(
         ),
     ],
 )
+post__create_dto_mapper = pgsql_retort.get_converter(
+    dtos.CreatePostDto, models.CreatePostDto
+)
 post__create_mapper = pgsql_retort.get_converter(
-    models.CreatePostDto,
+    dtos.CreatePostDto,
     PostDatabaseModel,
     recipe=[
         allow_unlinked_optional(P[PostDatabaseModel].id),
@@ -83,9 +86,10 @@ post__create_mapper = pgsql_retort.get_converter(
         allow_unlinked_optional(P[PostDatabaseModel].category),
     ],
 )
-post__map_to_pydantic = py_retort.get_converter(
+post__map_to_pydantic = py_retort.get_converter(Post, models.PostModel)
+post__map_to_pydantic_detail = py_retort.get_converter(
     Post,
-    models.PostModel,
+    models.PostModelDetail,
     recipe=[coercer(Category, models.CategoryModel, category__map_to_pydantic)],
 )
 
@@ -93,8 +97,8 @@ post__map_to_pydantic = py_retort.get_converter(
 @py_retort.impl_converter(
     recipe=[
         link_function(
-            lambda dto, user_id: user_id,
-            P[models.UpdatePostDto].id,
+            lambda dto, post_id: post_id,
+            P[dtos.UpdatePostDto].id,
         )
     ]
 )

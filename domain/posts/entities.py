@@ -16,6 +16,7 @@ class Post:
     id: int
     body: str
     title: str
+    category_id: int
     created_at: datetime
     updated_at: datetime
     category: Category

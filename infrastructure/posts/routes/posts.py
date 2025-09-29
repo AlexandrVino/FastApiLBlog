@@ -9,16 +9,12 @@ router = APIRouter(route_class=DishkaRoute)
 
 @router.get("/", response_model=list[dtos.PostModel])
 async def read_all(posts: FromDishka[PostsService]):
-    """Возвращает данные текущего аутентифицированного пользователя."""
-
     return map(mappers.post__map_to_pydantic, await posts.read_all(None))
 
 
-@router.get("/{post_id}", response_model=dtos.PostModel)
+@router.get("/{post_id}", response_model=dtos.PostModelDetail)
 async def read(
     post_id: int,
     posts: FromDishka[PostsService],
 ):
-    """Возвращает данные текущего аутентифицированного пользователя."""
-
-    return mappers.post__map_to_pydantic(await posts.read(post_id))
+    return mappers.post__map_to_pydantic_detail(await posts.read(post_id))

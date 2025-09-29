@@ -55,13 +55,13 @@ async def test_admin_categories_crud(client, admin_token):
 
     # list
     response = await client.get(
-        "/api/v1/admin/categories/", headers={"Authorization": f"Bearer {admin_token}"}
+        "/api/v1/categories/", headers={"Authorization": f"Bearer {admin_token}"}
     )
     assert response.status_code == 200
 
     # get
     response = await client.get(
-        f"/api/v1/admin/categories/{cid}",
+        f"/api/v1/categories/{cid}",
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert response.status_code == 200
@@ -92,7 +92,7 @@ async def test_admin_posts_crud(client, admin_token):
     require_admin(admin_token)
     # Ensure at least one category exists
     response = await client.get(
-        "/api/v1/admin/categories/", headers={"Authorization": f"Bearer {admin_token}"}
+        "/api/v1/categories/", headers={"Authorization": f"Bearer {admin_token}"}
     )
     assert response.status_code == 200
 
@@ -125,13 +125,13 @@ async def test_admin_posts_crud(client, admin_token):
 
     # list admin
     response = await client.get(
-        "/api/v1/admin/posts/", headers={"Authorization": f"Bearer {admin_token}"}
+        "/api/v1/posts/", headers={"Authorization": f"Bearer {admin_token}"}
     )
     assert response.status_code == 200
 
     # get admin
     response = await client.get(
-        f"/api/v1/admin/posts/{pid}", headers={"Authorization": f"Bearer {admin_token}"}
+        f"/api/v1/posts/{pid}", headers={"Authorization": f"Bearer {admin_token}"}
     )
     assert response.status_code == 200
 

@@ -104,13 +104,17 @@ async function listPosts() {
     return http('/api/v1/posts/');
 }
 
+async function listPostsWithCategory(category_id) {
+    return http(`/api/v1/categories/${category_id}/posts`);
+}
+
 async function readPost(id) {
     return http(`/api/v1/posts/${id}`);
 }
 
 // Admin posts
 async function adminListPosts() {
-    return http('/api/v1/admin/posts/');
+    return http('/api/v1/posts/');
 }
 
 async function adminCreatePost(payload) {
@@ -118,7 +122,7 @@ async function adminCreatePost(payload) {
 }
 
 async function adminGetPost(id) {
-    return http(`/api/v1/admin/posts/${id}`);
+    return http(`/api/v1/posts/${id}`);
 }
 
 async function adminUpdatePost(id, payload) {
@@ -140,7 +144,7 @@ async function readCategory(id) {
 
 // Admin categories
 async function adminListCategories() {
-    return http('/api/v1/admin/categories/');
+    return http('/api/v1/categories/');
 }
 
 async function adminCreateCategory(payload) {
@@ -148,7 +152,7 @@ async function adminCreateCategory(payload) {
 }
 
 async function adminGetCategory(id) {
-    return http(`/api/v1/admin/categories/${id}`);
+    return http(`/api/v1/categories/${id}`);
 }
 
 async function adminUpdateCategory(id, payload) {

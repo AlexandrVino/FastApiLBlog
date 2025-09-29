@@ -69,10 +69,22 @@ const views = {
     async categoryDetail(id) {
         try {
             const cat = await readCategory(id);
+            const posts = await listPostsWithCategory(id);
 
             return `<div class="card">
               <h3>${escapeHtml(cat.title)}</h3>
               <p>${escapeHtml(cat.description || '')}</p>
+            </div>
+            <div class="grid">
+            ${posts.map(p => `
+              <div class="card">
+                <h3>${escapeHtml(p.title)}</h3>
+                <p class="muted">Категория: <span class="badge">${escapeHtml(cat.title)}</span></p>
+                <div class="actions">
+                  <a href="#/posts/${p.id}" class="btn">Читать</a>
+                </div>
+              </div>
+            `).join('')}
             </div>`;
         } catch (e) {
             return `<div class="card"><p class="error">Ошибка: ${e.message}</p></div>`;
@@ -100,13 +112,13 @@ const views = {
         <button data-action="admin-create-post">Создать пост</button>
       </div>
       <table class="table card">
-        <thead><tr><th>ID</th><th>Заголовок</th><th>Категория</th><th></th></tr></thead>
+        <thead><tr><th>ID</th><th>Заголовок</th><th>Текст</th><th></th></tr></thead>
         <tbody>
           ${posts.map(p => `
             <tr>
               <td>${p.id}</td>
               <td>${escapeHtml(p.title)}</td>
-              <td>${escapeHtml(p.category?.title || '—')}</td>
+              <td>${escapeHtml(p.body.substring(0, 10) + (p.body.length > 10 ? '...' : ''))}</td>
               <td class="actions">
                 <a href="#/admin/posts/${p.id}">Править</a>
                 <button data-action="admin-delete-post" data-id="${p.id}" class="danger">Удалить</button>
@@ -282,6 +294,12 @@ function attachActions() {
             location.reload();
         };
     });
+    document.querySelectorAll('[data-action="admin-delete-user"]').forEach(btn => {
+        btn.onclick = async () => {
+            await adminDeleteUser(btn.dataset.id);
+            location.reload();
+        };
+    });
     document.querySelectorAll('[data-action="admin-create-post"]').forEach(btn => {
         btn.onclick = () => {
             location.hash = '#/admin/posts/new';
@@ -299,7 +317,6 @@ function attachActions() {
             e.preventDefault();
             const fd = new FormData(formPost);
             const payload = {
-                id: formPost.dataset.id ? Number(formPost.dataset.id) : undefined,
                 title: fd.get('title'),
                 body: fd.get('body'),
                 category_id: Number(fd.get('categoryId'))
@@ -320,7 +337,7 @@ function attachActions() {
             const fd = new FormData(formCategory);
             const payload = {title: fd.get('title'), description: fd.get('description')};
             if (formCategory.dataset.id) {
-                await adminUpdateCategory(formCategory.dataset.id, {id: Number(formCategory.dataset.id), ...payload});
+                await adminUpdateCategory(formCategory.dataset.id, payload);
             } else {
                 await adminCreateCategory(payload);
             }
